@@ -25,7 +25,7 @@ function checksExistsUserAccount(request, response, next) {
 }
 
 function checksCreateTodosUserAvailability(request, response, next) {
-  // Complete aqui
+  
   const {user} = request;
 
   if((user.pro == false && user.todos.length < 10) || user.pro == true){
@@ -36,11 +36,31 @@ function checksCreateTodosUserAvailability(request, response, next) {
 }
 
 function checksTodoExists(request, response, next) {
-  // Complete aqui
+ const {username} = request.headers;
+ const {id} = request.params;
+
+ const userFound = users.find((user) => user.username === username)
+ if(!userFound){
+  return response.status(404).json({error : "User not found!"});
+ }
+  const checkUUID = validate(id);
+
+  if(!checkUUID){
+    return response.status(400).json({error : "ID not validate"});
+  }
+
+ const todo = userFound.todos.find((task) => task.id === id);
+ if(!todo){
+  return response.status(404).json({error : "Task not found!"});
+ }
+
+ request.user = userFound;
+ request.todo = todo;
+ return next();
 }
 
 function findUserById(request, response, next) {
-  // Complete aqui
+ 
   const {id} = request.params;
 
   const user = users.find((user) => user.id === id);
